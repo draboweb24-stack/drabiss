@@ -1,0 +1,78 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>DRABISS - Accès Élève</title>
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    p {
+      font-size: 18px;
+      color: #333;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 250px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #chat {
+      display: none;
+      margin-top: 30px;
+      width: 80%;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>DRABISS</h1>
+  <p>Veuillez mettre votre code pour ouvrir :</p>
+  <input type="text" id="code" placeholder="Entrer le code ici">
+  <button onclick="verifierCode()">Valider</button>
+
+  <div id="chat">
+    <h2>Pose ta question ici</h2>
+ <textarea placeholder="Écris ta question..."></textarea>
+  </div>
+
+  <script>
+    const codeValide = "123456"; // Tu peux changer ce code
+
+    function verifierCode() {
+      const codeEntre = document.getElementById("code").value;
+      if (codeEntre === codeValide) {
+        document.getElementById("chat").style.display = "block";
+      } else {
+        alert("Code incorrect. Vérifie ton ticket.");
+      }
+    }
+  </script>
+</body>
+</html>
+```
