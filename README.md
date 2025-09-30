@@ -1,1 +1,44 @@
 # drabiss
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>DRABISS</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    #chatbox { display: none; margin-top: 20px; }
+    input, button { padding: 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>DRABISS</h1>
+  <p>Veuillez mettre votre code pour ouvrir :</p>
+
+  <input type="text" id="code" placeholder="Entrez votre code" />
+  <br>
+  <button onclick="verifierCode()">Valider</button>
+
+  <div id="chatbox">
+    <h2>Pose ta question ici :</h2>
+    <textarea rows="5" cols="40" placeholder="Pose ta question..."></textarea>
+    <br><br>
+    <button>Envoyer</button> <!-- À connecter à une vraie API plus tard -->
+  </div>
+
+  <script>
+    function verifierCode() {
+      const codeSaisi = document.getElementById("code").value;
+      const codeValide = "123456"; // Change ce code chaque jour si tu veux
+ if (codeSaisi === codeValide) {
+        document.getElementById("chatbox").style.display = "block";
+      } else {
+        alert("Code invalide. Réessaie ou demande un nouveau ticket.");
+      }
+    }
+  </script>
+
+</body>
+</html>
+```
