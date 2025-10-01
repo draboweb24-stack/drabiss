@@ -1,71 +1,52 @@
-
 ```html
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DRABISS</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 80px;
-    }
-    input, button, textarea {
-      padding: 10px;
-      font-size: 16px;
-      margin: 8px;
-    }
-  </style>
-</head>
-<body>
-  <h1>DRABISS</h1>
-  <p>Veuillez mettre votre code pour ouvrir.</p>
-  <input type="text" id="codeInput" placeholder="Entrez votre code" />
-  <button onclick="verifierCode()">Valider</button>
+<!-- Ajoute ça dans ton fichier HTML (dans <head> ou avant </body>) -->
+<script type="module">
+  // Importation depuis les CDN Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-  <div id="contenu" style="display:none;">
-    <h2>Pose ta question à l'Assistant</h2>
-    <textarea id="question" rows="4" cols="50" placeholder="Pose ta question ici..."></textarea><br/>
-    <button onclick="envoyerQuestion()">Envoyer</button>
-    <p><strong>Réponse :</strong></p>
-    <div id="reponse"></div>
-  </div>
+  // Ta config Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDaLEfamwm6GSFGNH_lyIoKaNgsVggkVKM",
+    authDomain: "drabiss.firebaseapp.com",
+    projectId: "drabiss",
+    storageBucket: "drabiss.firebasestorage.app",
+    messagingSenderId: "218797430971",
+    appId: "1:218797430971:web:102ba8065ef6f4967d319e",
+    measurementId: "G-3CWXB9VPDM"
+  };
 
-  <script>
-    const codesValides = ["A5732", "B4821", "C9354", "D1205", "E3479", " F2093", " G1847", "H3902", "J8456", "K2378", "L6543", "M8320", "N1058", "P7601", " Q9473", "R5632", "S7109", "T8491", "U1943", "V3285", " W1762",  "X4920", "Y3014", "Z6982", "A4089", "B2843", "C5710", "D6834", "E1946", "F3092", "G8275", " H1638", "J9450", "K5829", "L7103", "M3467", "N4081", "P5194", "Q6870", "R2301", "S9018", "T1437", "U6584", "V8932", "W2709", "X3705", "Y1830", " Z5064", "A9381", "B6402",];
+  // Initialiser Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
+  // Liste des codes
+  const codes = [
+ "A5732", "B4821", "C9354", "D1205", "E3479", "F2093", "G1847", "H3902", "J8456", "K2378",
+    "L6543", "M8320", "N1058", "P7601", "Q9473", "R5632", "S7109", "T8491", "U1943", "V3285",
+    "W1762", "X4920", "Y3014", "Z6982", "A4089", "B2843", "C5710", "D6834", "E1946", "F3092",
+    "G8275", "H1638", "J9450", "K5829", "L7103", "M3467", "N4081", "P5194", "Q6870", "R2301",
+    "S9018", "T1437", "U6584", "V8932", "W2709", "X3705", "Y1830", "Z5064", "A9381", "B6402"
+  ];
 
-    function verifierCode() {
-const code = document.getElementById("codeInput").value.trim().toUpperCase();
-      if (codesValides.includes(code)) {
-        document.getElementById("contenu").style.display = "block";
-      } else {
-        alert("Code invalide. Réessaie.");
-      }
-    }
+  // Fonction pour insérer dans Firestore
+  async function insertCodes() {
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24h
 
-    async function envoyerQuestion() {
-      const question = document.getElementById("question").value;
-
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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";
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: question }]
-        })
+    for (let code of codes) {
+      await addDoc(collection(db, "codes"), {
+        code: code.trim(),
+        used: false,
+        createdAt: now.toISOString(),
+        expiresAt: expiry.toISOString()
       });
-
-      const data = await response.json();
-      document.getElementById("reponse").innerText = data.choices[0].message.content;
     }
-  </script>
-</body>
-</html>
-```
 
+    alert("✅ 50 codes insérés dans Firestore avec succès !");
+  }
+
+  insertCodes(); // Exécute l’insertion une seule fois
+
+</script>
+```
