@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRABISS - IA</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #222;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    #chat {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 70%;
+    }
+    .user {
+      background: #d1e7dd;
+      margin-left: auto;
+    }
+    .bot {
+      background: #e2e3e5;
+      margin-right: auto;
+    }
+    #inputZone {
+      display: flex;
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ccc;
+    }
+    #userInput {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Bienvenue sur l’IA DRABISS 🤖</h2>
+  </header>
+
+  <div id="chat"></div>
+
+  <div id="inputZone">
+    <input id="userInput" type="text" placeholder="Écris ta question..." />
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+
+  <script>
+    // Vérifier si l’utilisateur a le droit d’accès
+    if (localStorage.getItem("accesIA") !== "true") {
+      alert("⛔ Accès refusé. Retour à l’accueil.");
+      window.location.href = "index.html";
+    }
+
+    const API_KEY = "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";
+
+    const chatBox = document.getElementById("chat");
+    const input = document.getElementById("userInput");
+
+    async function sendMessage() {
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      // Afficher le message utilisateur
+      appendMessage(userText, "user");
+      input.value = "";
+
+      // Appel API OpenAI
+      appendMessage("⏳ L’IA réfléchit...", "bot");
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: userText }]
+        })
+      });
+
+      const data = await response.json();
+      document.querySelector(".bot:last-child").remove(); // Supprime "⏳"
+      appendMessage(data.choices[0].message.content, "bot");
+    }
+
+    function appendMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("message", sender);
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
