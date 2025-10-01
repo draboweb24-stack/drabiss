@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insertion des codes</title>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // 🔑 Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDaLEfamwm6GSFGNH_lyIoKaNgsVggkVKM",
+      authDomain: "drabiss.firebaseapp.com",
+      projectId: "drabiss",
+      storageBucket: "drabiss.firebasestorage.app",
+      messagingSenderId: "218797430971",
+      appId: "1:218797430971:web:102ba8065ef6f4967d319e",
+      measurementId: "G-3CWXB9VPDM"
+    };
+
+    // Initialiser Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 📌 Les 50 codes que tu m’as donnés
+    const codes = [
+      "A5732", "B4821", "C9354", "D1205", "E3479", "F2093", "G1847", "H3902", "J8456", "K2378",
+      "L6543", "M8320", "N1058", "P7601", "Q9473", "R5632", "S7109", "T8491", "U1943", "V3285",
+      "W1762", "X4920", "Y3014", "Z6982", "A4089", "B2843", "C5710", "D6834", "E1946", "F3092",
+      "G8275", "H1638", "J9450", "K5829", "L7103", "M3467", "N4081", "P5194", "Q6870", "R2301",
+      "S9018", "T1437", "U6584", "V8932", "W2709", "X3705", "Y1830", "Z5064", "A9381", "B6402"
+    ];
+
+    async function insertCodes() {
+      const now = new Date();
+      const expiry = new Date(now.getTime() + 24 * 60 * 60 * 1000); // expire dans 24h
+
+      for (let code of codes) {
+        await addDoc(collection(db, "codes"), {
+          code: code.trim(),
+          used: false,
+          createdAt: now.toISOString(),
+          expiresAt: expiry.toISOString()
+        });
+      }
+
+      alert("✅ 50 codes insérés avec succès dans Firestore !");
+    }
+
+    window.onload = insertCodes;
+  </script>
+</head>
+<body>
+  <h1>Insertion des codes...</h1>
+  <p>Patiente quelques secondes ⏳</p>
+</body>
+</html>
