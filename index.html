@@ -1,42 +1,59 @@
+
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRABISS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 80px;
+    }
+    input, button, textarea {
+      padding: 10px;
+      font-size: 16px;
+      margin: 8px;
+    }
+  </style>
 </head>
 <body>
-  <h2>DRABISS</h2>
+  <h1>DRABISS</h1>
   <p>Veuillez mettre votre code pour ouvrir.</p>
-  <input type="text" id="code" placeholder="Entrez le code" />
+  <input type="text" id="codeInput" placeholder="Entrez votre code" />
   <button onclick="verifierCode()">Valider</button>
 
-  <div id="chat" style="display:none;">
-    <h3>Pose ta question à ChatGPT</h3>
-    <textarea id="question" rows="4" cols="50"></textarea><br>
+  <div id="contenu" style="display:none;">
+    <h2>Pose ta question à l'Assistant</h2>
+    <textarea id="question" rows="4" cols="50" placeholder="Pose ta question ici..."></textarea><br/>
     <button onclick="envoyerQuestion()">Envoyer</button>
-    <p id="reponse"></p>
+    <p><strong>Réponse :</strong></p>
+    <div id="reponse"></div>
   </div>
 
   <script>
-    const codeValide = "123456"; // à remplacer par ton vrai code d’accès
+    const codesValides = ["A5732", "B4821", "C9354", "D1205", "E3479", " F2093", " G1847", "H3902", "J8456", "K2378", "L6543", "M8320", "N1058", "P7601", " Q9473", "R5632", "S7109", "T8491", "U1943", "V3285", " W1762",  "X4920", "Y3014", "Z6982", "A4089", "B2843", "C5710", "D6834", "E1946", "F3092", "G8275", " H1638", "J9450", "K5829", "L7103", "M3467", "N4081", "P5194", "Q6870", "R2301", "S9018", "T1437", "U6584", "V8932", "W2709", "X3705", "Y1830", " Z5064", "A9381", "B6402",];
+
 
     function verifierCode() {
-      const code = document.getElementById("code").value;
-      if (code === codeValide) {
-        document.getElementById("chat").style.display = "block";
+const code = document.getElementById("codeInput").value.trim().toUpperCase();
+      if (codesValides.includes(code)) {
+        document.getElementById("contenu").style.display = "block";
       } else {
-        alert("Code invalide !");
+        alert("Code invalide. Réessaie.");
       }
     }
 
     async function envoyerQuestion() {
- const question = document.getElementById("question").value;
+      const question = document.getElementById("question").value;
 
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization":"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";
+          "Authorization": "Bearer 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";
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
@@ -51,3 +68,4 @@
 </body>
 </html>
 ```
+
