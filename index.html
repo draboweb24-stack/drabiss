@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DRABISS - Accès IA</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DRABISS - Connexion</title>
 
-  <!-- Script Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs, updateDoc } 
-      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import {
+      getFirestore, collection, query, where, getDocs,
+      updateDoc, runTransaction, addDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    // 🔑 Configuration Firebase
+    // 🔑 Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDaLEfamwm6GSFGNH_lyIoKaNgsVggkVKM",
       authDomain: "drabiss.firebaseapp.com",
@@ -22,57 +23,59 @@
       measurementId: "G-3CWXB9VPDM"
     };
 
-    // Initialisation
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ✅ Fonction de validation
+    // 🔐 Fonction pour valider un code
     async function validerCode() {
       const inputCode = document.getElementById("codeInput").value.trim();
+      if (!inputCode) { alert("❌ Entre ton code"); return; }
+
       const q = query(collection(db, "codes"), where("code", "==", inputCode));
-      const querySnapshot = await getDocs(q);
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) { alert("❌ Code invalide"); return; }
 
-      if (querySnapshot.empty) {
-        alert("❌ Code invalide !");
-        return;
+      const codeDoc = snapshot.docs[0];
+      const codeRef = codeDoc.ref;
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const freshSnap = await tx.get(codeRef);
+          if (!freshSnap.exists()) throw new Error("Code introuvable");
+          const data = freshSnap.data();
+          if (data.used) throw new Error("⚠️ Déjà utilisé");
+
+          // marque comme utilisé
+          tx.update(codeRef, { used: true });
+
+          // créer session 24h
+          const now = new Date();
+          const expires = new Date(now.getTime() + 24*60*60*1000);
+          const sessionDoc = await addDoc(collection(db, "sessions"), {
+            code: inputCode,
+            createdAt: now.toISOString(),
+            expiresAt: expires.toISOString()
+          });
+
+          // stocke en local
+          localStorage.setItem("sessionId", sessionDoc.id);
+        });
+
+        // ✅ redirection vers l’IA
+        window.location.href = "ia.html";
+
+      } catch (err) {
+        alert("Erreur: " + err.message);
       }
-
-      const docRef = querySnapshot.docs[0].ref;
-      const data = querySnapshot.docs[0].data();
-      const now = new Date();
-
-      if (data.used) {
-        alert("⚠️ Code déjà utilisé !");
-        return;
-      }
-
-      if (new Date(data.expiresAt) < now) {
-        alert("⌛ Code expiré !");
-        return;
-      }
-
-      // Marquer comme utilisé
-      await updateDoc(docRef, { used: true });
-
-      // Sauvegarder l’accès localement
-      localStorage.setItem("accesIA", "true");
-
-      // Redirection vers la page IA
-      window.location.href = "ia.html";
     }
 
-    // Rendre la fonction accessible au bouton
     window.validerCode = validerCode;
   </script>
 </head>
 <body>
-  <h1>DRABISS</h1>
+  <h1>🔑 Bienvenue sur DRABISS</h1>
   <p>Entre ton mot de passe :</p>
-
-  <!-- Champ pour entrer le code -->
-  <input id="codeInput" type="text" placeholder="Mot de passe" />
-
-  <!-- Bouton pour valider -->
+  <input id="codeInput" type="text" placeholder="Mot de passe"/>
   <button onclick="validerCode()">Valider</button>
 </body>
 </html>
